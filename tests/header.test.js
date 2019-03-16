@@ -1,4 +1,6 @@
 const puppeteer = require('puppeteer')
+const sessionFactory = require('./factories/sessionFactory')
+const userFactory = require('./factories/userFactory')
 
 let browser
 let page
@@ -25,23 +27,10 @@ test('clicking on login starts oauth flow', async () => {
 })
 
 test('When Signed in, shows logout button', async () => {
-  const Buffer = require('safe-buffer').Buffer
-  const Keygrip = require('keygrip')
-  const keys = require('../config/dev')
+  const user = await userFactory()
+  const { sig, session } = sessionFactory(user)
 
-  const id = '5c88505afa58e3a1ebfe1935'
-  const session = {
-    passport: {
-      user: id,
-    },
-  }
-  const sessionStringified = JSON.stringify(session)
-  const sessionBuffered = Buffer.from(sessionStringified).toString('base64')
-
-  const keygrip = new Keygrip([keys.cookieKey])
-  const sig = keygrip.sign(`session=${sessionBuffered}`)
-
-  await page.setCookie({ name: 'session', value: sessionBuffered })
+  await page.setCookie({ name: 'session', value: session })
   await page.setCookie({ name: 'session.sig', value: sig })
   await page.goto('http://localhost:3000')
 
