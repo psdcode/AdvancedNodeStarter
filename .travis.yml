@@ -1,0 +1,24 @@
+language: node_js
+node_js:
+  - '10'
+dist: trusty
+services:
+  - mongodb
+  - redis-server
+env:
+  # one build per line, so put all env vars that would like to exist within a single build on same line
+  - NODE_ENV=ci PORT=3000
+cache:
+  directories:
+    - node_modules
+    - client/node_modules
+install:
+  - npm install
+  - npm run build
+script:
+  # no hangup (nohup) prevents process shutdown if shell is closed by subsequently executed command
+  # & forces command to start in background of shell so can reliably execute commands afterwards
+  - nohup npm run start &
+  # pause for server to be ready before test launch
+  - sleep 3
+  - npm run test
