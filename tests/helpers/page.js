@@ -6,6 +6,7 @@ class CustomPage {
   static async build(isHeadless) {
     const browser = await puppeteer.launch({
       headless: isHeadless,
+      args: ['--no-sandbox'], // keeps from having tinker with settings of virtual machine assigned by travis, will reduce amount of time for test to run
     })
 
     const page = await browser.newPage()
