@@ -3,7 +3,8 @@ const Page = require('./helpers/page.js')
 let page
 
 beforeEach(async () => {
-  page = await Page.build()
+  const isHeadless = true
+  page = await Page.build(isHeadless)
   await page.goto('http://localhost:3000')
 })
 
@@ -92,30 +93,30 @@ describe('When logged in and on blogs page', () => {
 })
 
 describe('When user is not signed in', () => {
-  test('User cannot create blog posts', async () => {
-    const result = await page.evaluate(() =>
-      fetch('/api/blogs', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ title: 'Sneaky Title', content: 'Sneaky Body' }),
-      }).then(resp => resp.json())
-    )
-    expect(result).toEqual({ error: 'You must log in!' })
-  })
+  const actions = [
+    {
+      method: 'get',
+      path: '/api/blogs',
+      spec: 'cannot create blog posts',
+    },
+    {
+      method: 'post',
+      path: '/api/blogs',
+      data: {
+        title: 'Sneaky Title',
+        content: 'Sneaky Body',
+      },
+      spec: 'cannot get blog posts',
+    },
+  ]
+  const expected = { error: 'You must log in!' }
+  const testSpecs = actions.map(({ spec }) => spec).join(' or ')
 
-  test('User cannot create blog posts', async () => {
-    const result = await page.evaluate(() =>
-      fetch('/api/blogs', {
-        method: 'GET',
-        credentials: 'same-origin',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }).then(resp => resp.json())
-    )
-    expect(result).toEqual({ error: 'You must log in!' })
+  test(`User ${testSpecs}`, async () => {
+    const results = await page.execRequests(actions)
+
+    results.forEach(result => {
+      expect(result).toEqual(expected)
+    })
   })
 })
