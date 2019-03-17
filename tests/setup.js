@@ -1,6 +1,8 @@
+jest.setTimeout(30000)
+
+require('../models/User')
 const mongoose = require('mongoose')
 const keys = require('../config/keys')
-require('../models/User')
 
 mongoose.Promise = global.Promise
 // Add useMongoClient to avoid deprecation warning
