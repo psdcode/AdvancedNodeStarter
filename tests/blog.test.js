@@ -17,7 +17,7 @@ describe('When logged in and on blogs page', () => {
     await page.login('blogs')
   })
 
-  test('blog create button is present', async () => {
+  test('Blog create button is present', async () => {
     // Click button to create new blog post
     const createBlogPostBtnContent = await page.getContentsOfElement(
       'a[href="/blogs/new"] i.material-icons'
@@ -32,7 +32,7 @@ describe('When logged in and on blogs page', () => {
       await page.click('a[href="/blogs/new"]')
     })
 
-    test('can navigate to new blog post form', async () => {
+    test('Can navigate to new blog post form', async () => {
       // Check if form label displayed
       const labelElementSelector = 'form .title label'
       const labelTxt = await page.getContentsOfElement(labelElementSelector)
@@ -44,7 +44,7 @@ describe('When logged in and on blogs page', () => {
       beforeEach(async () => {
         await page.click('form button[type="submit"]')
       })
-      test('the form shows an error message', async () => {
+      test('The form shows error messages', async () => {
         const titleErrorMessage = await page.getContentsOfElement(
           '.title .red-text'
         )
@@ -88,5 +88,34 @@ describe('When logged in and on blogs page', () => {
         expect(blogPostContent).toEqual(testContent)
       })
     })
+  })
+})
+
+describe('When user is not signed in', () => {
+  test('User cannot create blog posts', async () => {
+    const result = await page.evaluate(() =>
+      fetch('/api/blogs', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title: 'Sneaky Title', content: 'Sneaky Body' }),
+      }).then(resp => resp.json())
+    )
+    expect(result).toEqual({ error: 'You must log in!' })
+  })
+
+  test('User cannot create blog posts', async () => {
+    const result = await page.evaluate(() =>
+      fetch('/api/blogs', {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).then(resp => resp.json())
+    )
+    expect(result).toEqual({ error: 'You must log in!' })
   })
 })
