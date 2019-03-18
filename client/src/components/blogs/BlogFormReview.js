@@ -1,14 +1,19 @@
 // BlogFormReview shows users their form inputs for review
-import _ from 'lodash';
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import formFields from './formFields';
-import { withRouter } from 'react-router-dom';
-import * as actions from '../../actions';
+import _ from 'lodash'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import formFields from './formFields'
+import { withRouter } from 'react-router-dom'
+import * as actions from '../../actions'
 
 class BlogFormReview extends Component {
+  constructor() {
+    super()
+    this.state = { file: null }
+  }
+
   renderFields() {
-    const { formValues } = this.props;
+    const { formValues } = this.props
 
     return _.map(formFields, ({ name, label }) => {
       return (
@@ -16,12 +21,12 @@ class BlogFormReview extends Component {
           <label>{label}</label>
           <div>{formValues[name]}</div>
         </div>
-      );
-    });
+      )
+    })
   }
 
   renderButtons() {
-    const { onCancel } = this.props;
+    const { onCancel } = this.props
 
     return (
       <div>
@@ -36,15 +41,19 @@ class BlogFormReview extends Component {
           <i className="material-icons right">email</i>
         </button>
       </div>
-    );
+    )
+  }
+
+  onFileChange({ target }) {
+    this.setState({ file: target.files[0] })
   }
 
   onSubmit(event) {
-    event.preventDefault();
+    event.preventDefault()
 
-    const { submitBlog, history, formValues } = this.props;
+    const { submitBlog, history, formValues } = this.props
 
-    submitBlog(formValues, history);
+    submitBlog(formValues, this.state.file, history)
   }
 
   render() {
@@ -52,15 +61,24 @@ class BlogFormReview extends Component {
       <form onSubmit={this.onSubmit.bind(this)}>
         <h5>Please confirm your entries</h5>
         {this.renderFields()}
-
+        <h5>Add An Image</h5>
+        <input
+          onChange={this.onFileChange.bind(this)}
+          type="file"
+          accept="image/*"
+        />
+        <hr />
         {this.renderButtons()}
       </form>
-    );
+    )
   }
 }
 
 function mapStateToProps(state) {
-  return { formValues: state.form.blogForm.values };
+  return { formValues: state.form.blogForm.values }
 }
 
-export default connect(mapStateToProps, actions)(withRouter(BlogFormReview));
+export default connect(
+  mapStateToProps,
+  actions
+)(withRouter(BlogFormReview))
