@@ -12,7 +12,7 @@ class BlogShow extends Component {
       const fullImgUrl = `${this.props.blog.bucketUrl}/${
         this.props.blog.imageUrl
       }`
-      return <img src={fullImgUrl} />
+      return <img alt="Blog Entry" src={fullImgUrl} />
     }
   }
 
